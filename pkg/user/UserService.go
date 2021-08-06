@@ -919,7 +919,7 @@ func (impl UserServiceImpl) DeleteUser(bean *bean.UserInfo) (bool, error) {
 }
 
 func (impl UserServiceImpl) CheckUserRoles(id int32) ([]string, error) {
-	model, err := impl.userRepository.GetById(id)
+	model, err := impl.userRepository.GetByIdIncludeDeleted(id)
 	if err != nil {
 		impl.logger.Errorw("error while fetching user from db", "error", err)
 		return nil, err
