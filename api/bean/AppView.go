@@ -102,6 +102,7 @@ type DeploymentDetailContainer struct {
 	Deprecated                    bool            `json:"deprecated"`
 	K8sVersion                    string          `json:"k8sVersion"`
 	ProjectName                   string          `json:"projectName"`
+	CiArtifactId         		  int             `json:"ciArtifactId"`
 }
 
 type AppDetailContainer struct {
