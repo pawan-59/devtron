@@ -81,10 +81,6 @@ It will return the list of filtered apps with details related to each env
 */
 func (impl AppListingRepositoryImpl) FetchAppsByEnvironment(appListingFilter helper.AppListingFilter) ([]*bean.AppEnvironmentContainer, error) {
 	impl.Logger.Debug("reached at FetchAppsByEnvironment:")
-	t1 := time.Now()
-	t2 := time.Now()
-	impl.Logger.Infow("api response time testing", "time", time.Now().String(), "time diff", t2.Unix()-t1.Unix(), "stage", "1.1")
-	t1 = t2
 	var appEnvArr []*bean.AppEnvironmentContainer
 	query := impl.appListingRepositoryQueryBuilder.BuildAppListingQueryLastDeploymentTime()
 	impl.Logger.Debugw("basic app detail query: ", query)
@@ -95,9 +91,6 @@ func (impl AppListingRepositoryImpl) FetchAppsByEnvironment(appListingFilter hel
 		impl.Logger.Error(err)
 		return appEnvArr, err
 	}
-	t2 = time.Now()
-	impl.Logger.Infow("api response time testing", "time", time.Now().String(), "time diff", t2.Unix()-t1.Unix(), "stage", "1.2")
-	t1 = t2
 	for _, item := range lastDeployedTimeDTO {
 		if _, ok := lastDeployedTimeMap[item.PipelineId]; ok {
 			continue
@@ -109,9 +102,7 @@ func (impl AppListingRepositoryImpl) FetchAppsByEnvironment(appListingFilter hel
 			CiArtifactId:     item.CiArtifactId,
 		}
 	}
-	t2 = time.Now()
-	impl.Logger.Infow("api response time testing", "time", time.Now().String(), "time diff", t2.Unix()-t1.Unix(), "stage", "1.3")
-	t1 = t2
+
 	var appEnvContainer []*bean.AppEnvironmentContainer
 	appsEnvquery := impl.appListingRepositoryQueryBuilder.BuildAppListingQuery(appListingFilter)
 	impl.Logger.Debugw("basic app detail query: ", appsEnvquery)
@@ -120,9 +111,7 @@ func (impl AppListingRepositoryImpl) FetchAppsByEnvironment(appListingFilter hel
 		impl.Logger.Error(appsErr)
 		return appEnvContainer, appsErr
 	}
-	t2 = time.Now()
-	impl.Logger.Infow("api response time testing", "time", time.Now().String(), "time diff", t2.Unix()-t1.Unix(), "stage", "1.4")
-	t1 = t2
+
 	latestDeploymentStatusMap := map[string]*bean.AppEnvironmentContainer{}
 	for _, item := range appEnvContainer {
 		if item.EnvironmentId > 0 && item.PipelineId > 0 && item.Active == false {
@@ -157,9 +146,7 @@ func (impl AppListingRepositoryImpl) FetchAppsByEnvironment(appListingFilter hel
 		appEnvArr = append(appEnvArr, item)
 		latestDeploymentStatusMap[key] = item
 	}
-	t2 = time.Now()
-	impl.Logger.Infow("api response time testing", "time", time.Now().String(), "time diff", t2.Unix()-t1.Unix(), "stage", "1.5")
-	t1 = t2
+
 	return appEnvArr, nil
 }
 
@@ -169,14 +156,13 @@ func (impl AppListingRepositoryImpl) DeploymentDetailsByAppIdAndEnvId(appId int,
 	var deploymentDetail bean.DeploymentDetailContainer
 	query := "SELECT env.environment_name, a.app_name, ceco.namespace, u.email_id as last_deployed_by" +
 		" , cia.material_info, pco.created_on AS last_deployed_time, pco.pipeline_release_counter as release_version" +
-		" , env.default, cia.data_source, p.pipeline_name as last_deployed_pipeline, t.name as project_name, cia.id as ci_artifact_id" +
+		" , env.default, cia.data_source, p.pipeline_name as last_deployed_pipeline" +
 		" FROM chart_env_config_override ceco" +
 		" INNER JOIN environment env ON env.id=ceco.target_environment" +
 		" INNER JOIN pipeline_config_override pco ON pco.env_config_override_id = ceco.id" +
 		" INNER JOIN pipeline p on p.id = pco.pipeline_id" +
 		" INNER JOIN ci_artifact cia on cia.id = pco.ci_artifact_id" +
 		" INNER JOIN app a ON a.id=p.app_id" +
-		" INNER JOIN team t ON t.id=a.team_id" +
 		" LEFT JOIN users u on u.id=pco.created_by" +
 		" WHERE a.app_store is false AND a.id=? AND env.id=? AND p.deleted = FALSE AND env.active = TRUE" +
 		" ORDER BY pco.created_on desc limit 1;"
