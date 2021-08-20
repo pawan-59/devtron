@@ -208,34 +208,6 @@ type CiPipelineMaterial struct {
 	GitTag        string    `json:"GitTag"`
 }
 
-type CiGitWebhookTriggerRequest struct {
-	Ref          string     `json:"ref"`
-	RefType      string     `json:"ref_type"`
-	MasterBranch string     `json:"master_branch"`
-	Description  string     `json:"description"`
-	PusherType   string     `json:"pusher_type"`
-	Repository   Repository `json:"repository"`
-}
-
-type Repository struct {
-	Id        int       `json:"id"`
-	NodeId    string    `json:"node_id"`
-	Name      string    `json:"name"`
-	FullName  string    `json:"full_name"`
-	Private   bool      `json:"private"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	PushedAt  time.Time `json:"pushed_at"`
-	CloneUrl  string    `json:"clone_url"`
-	SvnUrl    string    `json:"svn_url"`
-}
-
-type Owner struct {
-	Login string `json:"login"`
-	Id    int    `json:"id"`
-	Type  string `json:"type"`
-}
-
 type CiTriggerRequest struct {
 	PipelineId         int                  `json:"pipelineId"`
 	CiPipelineMaterial []CiPipelineMaterial `json:"ciPipelineMaterials" validate:"required"`
